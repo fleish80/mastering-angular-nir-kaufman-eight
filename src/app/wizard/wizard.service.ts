@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import {Injectable} from '@angular/core';
+import {FormGroup, FormBuilder, Validators, FormControl} from '@angular/forms';
+import {WizardValidators} from './wizard-validators';
 
 @Injectable()
 export class WizardService {
@@ -7,9 +8,15 @@ export class WizardService {
 
   constructor(private formBuilder: FormBuilder) {
     this.wizardForm = formBuilder.group({
-      email: [null],
-      password: [null],
+      username: [null],
+      email: [null, [Validators.required, WizardValidators.unique(['nir'])]],
+      password: [null, [Validators.required]],
+      agree: [true]
     });
+  }
+
+  getControl(controlName: string): FormControl {
+    return this.wizardForm.get(controlName) as FormControl;
   }
 
   handleSubmit() {
