@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
-import {FormGroup, FormBuilder, Validators, FormControl} from '@angular/forms';
+import {FormGroup, FormBuilder, Validators, FormControl, AbstractControl} from '@angular/forms';
 import {WizardValidators} from './wizard-validators';
+import {combineLatest} from 'rxjs';
 
 @Injectable()
 export class WizardService {
@@ -8,12 +9,14 @@ export class WizardService {
 
   constructor(private formBuilder: FormBuilder) {
     this.wizardForm = formBuilder.group({
-      yearOfBirth: [null],
+      yearOfBirth: [null, [Validators.required]],
       email: [null, [Validators.required]],
       password: [null, [Validators.required]],
-      agree: [true]
+      agree: [true],
+      childrenAge: formBuilder.array([])
     });
     this.registerUserNameUniquenessValidator();
+    this.registerDisableValidator();
   }
 
   registerUserNameUniquenessValidator() {
@@ -28,8 +31,22 @@ export class WizardService {
       });
   }
 
-  getControl(controlName: string): FormControl {
-    return this.wizardForm.get(controlName) as FormControl;
+  registerDisableValidator() {
+    combineLatest([
+      this.getControl('email').statusChanges,
+      this.getControl('yearOfBirth').statusChanges
+    ]).subscribe(statuses => {
+      const invalid = statuses.some(status => status === 'INVALID');
+      if (invalid) {
+        this.getControl('password').disable();
+      } else {
+        this.getControl('password').enable();
+      }
+    });
+  }
+
+  getControl(controlName: string): AbstractControl {
+    return this.wizardForm.get(controlName);
   }
 
   handleSubmit() {

@@ -8,6 +8,15 @@
       formControlName="yearOfBirth"
       id="userName"/>
   </div>
+
+  <button (click)="addChild()" class="btn btn-primary">Add child</button>
+
+  <ng-container *ngFor="let child of children; let i=index">
+    <div class="for-group">
+      <input type="number" [formControl]="$any(children[i])">
+    </div>
+  </ng-container>
+
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
     <input
@@ -27,9 +36,11 @@
       type="password"
       class="form-control"
       formControlName="password"
+      [unique]="['nir', 'joe']"
       [ngClass]="getValidationCssClass('password')"
       id="exampleInputPassword1"/>
   </div>
+  <pre>{{wizardService.getControl('password').errors | json}}</pre>
   <div class="form-group form-check">
     <input type="checkbox" class="form-check-input" formControlName="agree" id="exampleCheck1"/>
     <label class="form-check-label" for="exampleCheck1">Check me out</label>

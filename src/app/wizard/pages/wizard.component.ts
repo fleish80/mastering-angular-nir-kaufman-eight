@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WizardService } from '../wizard.service';
-import {FormControl} from '@angular/forms';
+import {FormArray, FormControl} from '@angular/forms';
 
 @Component({
   selector: 'app-wizard',
@@ -15,6 +15,11 @@ export class WizardComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  get children() {
+    const childArray = this.wizardService.getControl('childrenAge') as FormArray;
+    return childArray.controls;
+  }
+
   getValidationCssClass(controlName: string) {
     const formControl = this.wizardService.getControl(controlName);
     return {
@@ -23,4 +28,8 @@ export class WizardComponent implements OnInit {
     };
   }
 
+  addChild() {
+    const childArray = this.wizardService.getControl('childrenAge') as FormArray;
+    childArray.push(new FormControl());
+  }
 }
